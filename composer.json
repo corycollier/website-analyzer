@@ -1,0 +1,20 @@
+{
+    "name": "cory/documents",
+    "authors": [
+        {
+            "name": "Cory Collier",
+            "email": "cory.collier@ahss.org"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.2",
+        "symfony/config": "^3.2",
+        "symfony/dependency-injection": "^3.2",
+        "symfony/yaml": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "WebsiteAnalyzer\\": "src/"
+        }
+    }
+}
