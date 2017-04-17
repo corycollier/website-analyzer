@@ -1,9 +1,9 @@
 {
-    "name": "cory/documents",
+    "name": "corycollier/website-analyzer",
     "authors": [
         {
             "name": "Cory Collier",
-            "email": "cory.collier@ahss.org"
+            "email": "corycollier@corycollier.com"
         }
     ],
     "require": {
