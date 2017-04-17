@@ -48,11 +48,11 @@ class ListBuilder
         $config  = $this->getConfig();
         $data    = $this->getSites();
         $factory = $this->getFactory();
-        $count = count($data);
+        $count   = count($data);
         foreach ($data as $i => $site) {
             try {
                 $response = $client->request('GET', $site);
-                $sites[] = $factory->factory($response);
+                $sites[] = $factory->factory($site, $response);
             } catch (ClientException $exception) {
 
             } catch (ConnectException $exception) {
@@ -62,7 +62,7 @@ class ListBuilder
             } catch (RequestException $exception) {
 
             }
-            $this->reportProgress($i, $count);
+            $this->reportProgress($i, $count, $site);
         }
 
         $filename = $config['cache']['path'] . '/'. self::PROCESSED_SITES;
@@ -71,11 +71,11 @@ class ListBuilder
         return $this;
     }
 
-    public function reportProgress($currentStep, $totalSteps)
+    public function reportProgress($step, $total)
     {
-        $perc = floor(($currentStep / $totalSteps) * 100);
+        $perc = floor(($step / $total) * 100);
         $left = 100 - $perc;
-        $write = sprintf("\033[0G\033[2K[%'={$perc}s>%-{$left}s] - $currentStep%% - $currentStep/$totalSteps", "", "");
+        $write = sprintf("\033[0G\033[2K[%'={$perc}s>%-{$left}s] - $perc%% - $step/$total", "", "");
         fwrite(STDERR, $write);
     }
 

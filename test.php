@@ -17,6 +17,6 @@ define('CATEGORIZED_SITES_FILENAME', 'categorized-sites.txt');
 
 $builder = new ListBuilder('test.yml');
 $builder
-    // ->clear()
+    ->clear()
     ->process()
     ->dump();
