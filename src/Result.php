@@ -32,6 +32,11 @@ class Result
         ];
     }
 
+    public function getMetrics()
+    {
+        return $this->metrics;
+    }
+
     public function getUri()
     {
         return $this->uri;

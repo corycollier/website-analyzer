@@ -40,6 +40,11 @@ class CssComplexity implements MetricsInterface
         return $this;
     }
 
+    public function getScore()
+    {
+        return $this->score;
+    }
+
     protected function getRemoteFilenames(Result $result)
     {
         $body    = $result->getBody();

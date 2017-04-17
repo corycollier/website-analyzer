@@ -41,6 +41,11 @@ class DnsData implements MetricsInterface
         return $this;
     }
 
+    public function getData()
+    {
+        return $this->data;
+    }
+
     protected function getDomainName(Result $subject)
     {
         $uri = $subject->getUri();
