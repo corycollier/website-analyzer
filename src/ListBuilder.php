@@ -12,9 +12,9 @@ use GuzzleHttp\Exception\RequestException;
 
 class ListBuilder
 {
-    const GOOD_SITES = 'good-sites';
-    const BAD_SITES = 'bad-sites';
-    const RAW_SITES = 'raw-sites';
+    const GOOD_SITES      = 'good-sites';
+    const BAD_SITES       = 'bad-sites';
+    const RAW_SITES       = 'raw-sites';
     const PROCESSED_SITES = 'processed-sites';
 
     protected $config;
@@ -22,22 +22,34 @@ class ListBuilder
 
     public function __construct($configFile)
     {
-        $this->config = $this->getParsedConfig($configFile);
-        $this->factory = new WebsiteResultFactory;
+        $file          = new File($configFile);
+        $config        = $file->load()->getData();
+        $this->config  = Yaml::parse($config);
+        $this->factory = new ResultFactory();
+    }
+
+    public function clear()
+    {
+        $config  = $this->getConfig();
+        $filename = __DIR__ . '/../' . $config['cache']['path'] . '/'. self::PROCESSED_SITES;
+        $file = new File($filename);
+        $file->delete();
+        return $this;
     }
 
     public function process()
     {
         $processed = $this->getSites(self::PROCESSED_SITES);
         if ($processed) {
-            print_r($processed);
+            return $this;
         }
 
-        $client = new Client;
-        $config = $this->getConfig();
-        $data = $this->getSites();
+        $client  = new Client();
+        $config  = $this->getConfig();
+        $data    = $this->getSites();
         $factory = $this->getFactory();
-        foreach ($data as $site) {
+        $count = count($data);
+        foreach ($data as $i => $site) {
             try {
                 $response = $client->request('GET', $site);
                 $sites[] = $factory->factory($response);
@@ -50,22 +62,42 @@ class ListBuilder
             } catch (RequestException $exception) {
 
             }
+            $this->reportProgress($i, $count);
         }
+
         $filename = $config['cache']['path'] . '/'. self::PROCESSED_SITES;
-        $data = $this->serializeData($sites);
-        $this->filePutContents($filename, $data);
+        $file = new File($filename, $sites);
+        $file->serialize()->save();
+        return $this;
+    }
+
+    public function reportProgress($currentStep, $totalSteps)
+    {
+        $perc = floor(($currentStep / $totalSteps) * 100);
+        $left = 100 - $perc;
+        $write = sprintf("\033[0G\033[2K[%'={$perc}s>%-{$left}s] - $currentStep%% - $currentStep/$totalSteps", "", "");
+        fwrite(STDERR, $write);
+    }
+
+    public function dump()
+    {
+        $sites = $this->getSites(self::PROCESSED_SITES);
+        print_r($sites);
+        return 0;
     }
 
     public function getSites($siteType = self::RAW_SITES)
     {
         $config = $this->getConfig();
-        if ($siteType == self::RAW_SITES) {
-            return explode(PHP_EOL, $this->fileGetContents($config['data']['path']));
-        }
-
+        $filename = $config['data']['path'];
         if ($siteType == self::PROCESSED_SITES) {
-            $data = $this->fileGetContents($config['cache']['path'] . '/'. self::PROCESSED_SITES);
-            return $this->unserializeData($data);
+            $filename = $config['cache']['path'] . '/'. self::PROCESSED_SITES;
+        }
+        $file = new File($filename);
+        try {
+            return $file->load()->parse()->getData();
+        } catch (RuntimeException $exception) {
+            return false;
         }
     }
 
@@ -77,32 +109,5 @@ class ListBuilder
     protected function getConfig()
     {
         return $this->config;
-    }
-
-    protected function getParsedConfig($configFile)
-    {
-        return Yaml::parse($this->fileGetContents($configFile));
-    }
-
-    protected function serializeData($data)
-    {
-        return serialize($data);
-    }
-
-    protected function unserializeData($data)
-    {
-        return unserialize($data);
-    }
-
-    protected function fileGetContents($filename)
-    {
-        if (file_exists($filename)) {
-            return file_get_contents($filename);
-        }
-    }
-
-    protected function filePutContents($filename, $data)
-    {
-        return file_put_contents($filename, $data);
     }
 }
