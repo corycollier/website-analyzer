@@ -20,4 +20,3 @@ $builder
     // ->clear()
     ->process()
     ->dump();
-die;
