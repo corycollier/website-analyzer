@@ -2,35 +2,35 @@
 
 namespace WebsiteAnalyzer;
 
+use WebsiteAnalyzer\Metrics\MetricsFactory;
+
 class ResultAnalyzer
 {
+    protected $metricsFactory;
+
+    public function __construct()
+    {
+        $this->metricsFactory = new MetricsFactory();
+    }
+
     public function analyze(Result $subject)
     {
-        $body = $subject->getBody();
-        if ($this->isStatic($body)) {
-            $subject->setType('static');
+        $factory = $this->getMetricsFactory();
+        $metrics = [
+            'technology-stack',
+            'css-complexity',
+            'dns-data',
+        ];
+
+        foreach ($metrics as $type) {
+            $metric = $factory->factory($type);
+            $metric->calculate($subject);
+            $subject->addMetric($metric);
         }
-        if ($this->isWordpress($body)) {
-            $subject->setType('wordpress');
-        }
-        if ($this->isDrupal($body)) {
-            $subject->setType('drupal');
-        }
-        return $this;
     }
 
-    protected function isDrupal($contents) {
-      $result = preg_match('/Drupal/', $contents);
-      return $result;
-    }
-
-    protected function isWordpress($contents) {
-      $result = preg_match('/Wordpress/', $contents);
-      return $result;
-    }
-
-    protected function isStatic($contents) {
-      $result = preg_match('/assets\/css/', $contents);
-      return $result;
+    public function getMetricsFactory()
+    {
+        return $this->metricsFactory;
     }
 }

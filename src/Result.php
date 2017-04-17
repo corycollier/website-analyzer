@@ -2,12 +2,12 @@
 
 namespace WebsiteAnalyzer;
 
+use WebsiteAnalyzer\Metrics\MetricsInterface;
+
 class Result
 {
-    protected $type;
-    protected $ip;
+    protected $metrics;
     protected $uri;
-    protected $dns;
     protected $body;
     protected $headers;
     protected $status;
@@ -27,11 +27,14 @@ class Result
             'body' => '',
             'headers' => [],
             'status' => '',
-            'type' => '',
-            'ip'   => '',
+            'metrics' => '',
             'uri'  => '',
-            'dns'  => [],
         ];
+    }
+
+    public function getUri()
+    {
+        return $this->uri;
     }
 
     public function getBody()
@@ -39,28 +42,39 @@ class Result
         return $this->body;
     }
 
-    public function setType($type)
+    public function getHeaders()
     {
-        $this->type = $type;
-        return $this;
+        return $this->headers;
     }
 
-    public function getType()
+    public function addMetric(MetricsInterface $metric)
     {
-        return $this->type;
+        $type = $metric->getType();
+        $this->metrics[$type] = $metric;
+        return $this;
     }
 
     public function __sleep()
     {
         return [
-            // 'body',
+            'body',
             'headers',
             'status',
-            'type',
-            'ip',
+            'metrics',
             'uri',
-            'dns',
         ];
+    }
+
+    public function __debugInfo()
+    {
+        return [
+            'uri'     => $this->uri,
+            // 'body'    => substr($this->body, 0, 200),
+            // 'headers' => $this->headers,
+            // 'status'  => $this->status,
+            'metrics' => $this->metrics,
+        ];
+
     }
 
 }

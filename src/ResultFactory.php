@@ -18,12 +18,13 @@ class ResultFactory
         return $this->analyzer;
     }
 
-    public function factory(ResponseInterface $response)
+    public function factory($uri, ResponseInterface $response)
     {
         $result = new Result([
-            'headers' => $response->getHeaders(),
+            'headers' => array_change_key_case($response->getHeaders()),
             'status'  => $response->getStatusCode(),
             'body'    => (string)$response->getBody(),
+            'uri'     => $uri,
         ]);
 
         $this->getAnalyzer()->analyze($result);
