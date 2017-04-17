@@ -2,18 +2,23 @@
 This library allows a user to run through a list of websites, and determine which ones provide a positive response, and if so, what technology stack they're running on .
 
 ## Usage
+```yaml
+cache:
+  path: tmp
+  type: serialize
+data:
+  path: data/sites.txt
+
+```
+
 ```php
 use WebsiteAnalyzer\ListBuilder;
 
-$builder = new ListBuilder([
-  'store_type' => 'file'
-  'file_store' => 'path-to-raw-sites.txt',
-  'cache_dir' => 'tmp',
-]);
+$builder = new ListBuilder('test.yml');
 
-$builder->process();
-
-$goodSites = $builder->getSites(ListBuilder::GOOD_SITES);
-$badSites = $builder->getSites(ListBuilder::BAD_SITES);
-$rawSites = $builder->getSites(ListBuilder::RAW_SITES);
+$builder
+  ->clear() // clear any previous cache
+  ->process() // process the sites
+  ->dump() // dump out the results on screen;
+);
 ```
