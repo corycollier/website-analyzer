@@ -185,6 +185,7 @@ class CssComplexity implements MetricsInterface
             'ctools',
 
             //known wordpress files
+            'wp-content/plugins/',
 
             // common 3rd party libraries
             'reset.css',
