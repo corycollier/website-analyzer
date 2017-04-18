@@ -5,11 +5,13 @@ require 'vendor/autoload.php';
 use WebsiteAnalyzer\ListBuilder;
 
 // Define all of the constants
-$urls = array_map('trim', file('data/sites.txt'));
+$urls = array_map('trim', file('data/test.txt'));
 $builder = new ListBuilder();
 $results = $builder
     ->process($urls)
     ->getResults();
+
+file_put_contents('tmp/processed', serialize($results));
 
 $ips = [];
 $cssScores = [];

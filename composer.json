@@ -8,9 +8,6 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.2",
-        "symfony/config": "^3.2",
-        "symfony/dependency-injection": "^3.2",
-        "symfony/yaml": "^3.2",
         "symfony/dom-crawler": "^3.2",
         "pear/net_dns2": "^1.4"
     },
