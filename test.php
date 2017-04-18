@@ -2,21 +2,31 @@
 
 require 'vendor/autoload.php';
 
-use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
 use WebsiteAnalyzer\ListBuilder;
 
 // Define all of the constants
-define('UNFILTERED_SITES_FILENAME', 'list-of-sites.txt');
-define('GOOD_SITES_FILENAME', 'good-sites.txt');
-define('BAD_SITES_FILENAME', 'bad-sites.txt');
-define('CATEGORIZED_SITES_FILENAME', 'categorized-sites.txt');
+$urls = array_map('trim', file('data/test.txt'));
+$builder = new ListBuilder();
+$results = $builder
+    ->process($urls)
+    ->getResults();
 
-$builder = new ListBuilder('test.yml');
-$builder
-    ->clear()
-    ->process()
-    ->dump();
+file_put_contents('tmp/processed', serialize($results));
+
+$ips = [];
+$cssScores = [];
+foreach ($results as $result) {
+    $uri = $result->getUri();
+    $metrics = $result->getMetrics();
+    $dnsData = $metrics['dns-data']->getData();
+    $ip = $dnsData[0]['address'];
+    if (! array_key_exists($ip, $ips)) {
+        $ips[$ip] = [];
+    }
+    $ips[$ip][] = $uri;
+    $cssScores[$uri] = $metrics['css-complexity']->getScore();
+}
+
+print_r($results);
+print_r($ips);
+print_r($cssScores);

@@ -9,7 +9,6 @@ class TechnologyStack implements MetricsInterface
     protected $backend;
     protected $webserver;
 
-
     public function getType()
     {
         return 'technology-stack';
@@ -34,21 +33,62 @@ class TechnologyStack implements MetricsInterface
 
     protected function parseBackend(Result $subject)
     {
-        $body = $subject->getBody();
+        $body = strtolower($subject->getBody());
         $headers = $subject->getHeaders();
-        if ($this->isStatic($body)) {
-            $this->setBackend('static');
-        }
+        $patterns = $this->getTypePatterns();
 
-        if ($this->isWordpress($body)) {
-            $this->setBackend('wordpress');
-        }
-
-        if ($this->isDrupal($body)) {
-            $this->setBackend('drupal');
+        foreach ($patterns as $type => $pattern) {
+            if ($this->isMatch($body, $pattern)) {
+                $this->setBackend($type);
+            }
         }
 
         return $this;
+    }
+
+    protected function getTypePatterns()
+    {
+        return [
+            'static' => [
+                'assets/css',
+                'assets/js',
+                'modernizr',
+                'bootstrap.min.js'
+            ],
+            'Wordpress' => [
+                'wordpress',
+                'wp-content/themes',
+                'wp-content/plugins'
+            ],
+            'Drupal' => [
+                'drupal',
+                'sites/all/themes',
+                'sites/all/modules',
+                'sites/default/files'
+            ],
+            'Dot Net Nuke' => [
+                'js/dnncore.js',
+                'DnnForge',
+                'DesktopModules',
+                'js/dnn.xml.js',
+                'js/dnn.xml.jsparser.js'
+            ],
+        ];
+    }
+
+
+    protected function isMatch($content, $patterns = [])
+    {
+        $score = 0;
+        foreach ($patterns as $pattern) {
+            if (strpos($content, $pattern)) {
+                $score++;
+            }
+            if ($score > 2) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected function setWebserver($webserver)
@@ -64,20 +104,5 @@ class TechnologyStack implements MetricsInterface
     public function report()
     {
         return '';
-    }
-
-    protected function isDrupal($contents) {
-        $contents = strtolower($contents);
-        return (bool) strpos($contents, 'drupal');
-    }
-
-    protected function isWordpress($contents) {
-        $contents = strtolower($contents);
-        return (bool) strpos($contents, 'wordpress');
-    }
-
-    protected function isStatic($contents) {
-        $contents = strtolower($contents);
-        return (bool) strpos($contents, 'assets/css');
     }
 }

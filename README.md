@@ -2,23 +2,37 @@
 This library allows a user to run through a list of websites, and determine which ones provide a positive response, and if so, what technology stack they're running on .
 
 ## Usage
-```yaml
-cache:
-  path: tmp
-  type: serialize
-data:
-  path: data/sites.txt
-
-```
 
 ```php
+require 'vendor/autoload.php';
+
 use WebsiteAnalyzer\ListBuilder;
 
-$builder = new ListBuilder('test.yml');
+// Define all of the constants
+$urls = array_map('trim', file('data/test.txt'));
+$builder = new ListBuilder();
+$results = $builder
+    ->process($urls)
+    ->getResults();
 
-$builder
-  ->clear() // clear any previous cache
-  ->process() // process the sites
-  ->dump() // dump out the results on screen;
-);
+file_put_contents('tmp/processed', serialize($results));
+
+$ips = [];
+$cssScores = [];
+foreach ($results as $result) {
+    $uri = $result->getUri();
+    $metrics = $result->getMetrics();
+    $dnsData = $metrics['dns-data']->getData();
+    $ip = $dnsData[0]['address'];
+    if (! array_key_exists($ip, $ips)) {
+        $ips[$ip] = [];
+    }
+    $ips[$ip][] = $uri;
+    $cssScores[$uri] = $metrics['css-complexity']->getScore();
+}
+
+print_r($results);
+print_r($ips);
+print_r($cssScores);
+
 ```

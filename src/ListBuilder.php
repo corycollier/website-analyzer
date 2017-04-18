@@ -12,47 +12,26 @@ use GuzzleHttp\Exception\RequestException;
 
 class ListBuilder
 {
-    const GOOD_SITES      = 'good-sites';
-    const BAD_SITES       = 'bad-sites';
-    const RAW_SITES       = 'raw-sites';
-    const PROCESSED_SITES = 'processed-sites';
-
     protected $config;
     protected $factory;
+    protected $list;
+    protected $results;
 
-    public function __construct($configFile)
+    public function __construct()
     {
-        $file          = new File($configFile);
-        $config        = $file->load()->getData();
-        $this->config  = Yaml::parse($config);
         $this->factory = new ResultFactory();
     }
 
-    public function clear()
+    public function process($uris)
     {
-        $config  = $this->getConfig();
-        $filename = __DIR__ . '/../' . $config['cache']['path'] . '/'. self::PROCESSED_SITES;
-        $file = new File($filename);
-        $file->delete();
-        return $this;
-    }
-
-    public function process()
-    {
-        $processed = $this->getSites(self::PROCESSED_SITES);
-        if ($processed) {
-            return $this;
-        }
-
-        $client  = new Client();
-        $config  = $this->getConfig();
-        $data    = $this->getSites();
+        $sites   = [];
         $factory = $this->getFactory();
-        $count   = count($data);
-        foreach ($data as $i => $site) {
+        $count   = count($uris);
+        $client  = new Client();
+        foreach ($uris as $i => $uri) {
             try {
-                $response = $client->request('GET', $site);
-                $sites[] = $factory->factory($site, $response);
+                $response = $client->request('GET', $uri);
+                $sites[] = $factory->factory($uri, $response);
             } catch (ClientException $exception) {
 
             } catch (ConnectException $exception) {
@@ -62,13 +41,22 @@ class ListBuilder
             } catch (RequestException $exception) {
 
             }
-            $this->reportProgress($i, $count, $site);
+            $this->reportProgress($i, $count);
         }
 
-        $filename = $config['cache']['path'] . '/'. self::PROCESSED_SITES;
-        $file = new File($filename, $sites);
-        $file->serialize()->save();
+        $this->setResults($sites);
         return $this;
+    }
+
+    public function setResults($data)
+    {
+        $this->results = $data;
+        return $this;
+    }
+
+    public function getResults($data)
+    {
+        return $this->results;
     }
 
     public function reportProgress($step, $total)
@@ -77,28 +65,6 @@ class ListBuilder
         $left = 100 - $perc;
         $write = sprintf("\033[0G\033[2K[%'={$perc}s>%-{$left}s] - $perc%% - $step/$total", "", "");
         fwrite(STDERR, $write);
-    }
-
-    public function dump()
-    {
-        $sites = $this->getSites(self::PROCESSED_SITES);
-        print_r($sites);
-        return 0;
-    }
-
-    public function getSites($siteType = self::RAW_SITES)
-    {
-        $config = $this->getConfig();
-        $filename = $config['data']['path'];
-        if ($siteType == self::PROCESSED_SITES) {
-            $filename = $config['cache']['path'] . '/'. self::PROCESSED_SITES;
-        }
-        $file = new File($filename);
-        try {
-            return $file->load()->parse()->getData();
-        } catch (RuntimeException $exception) {
-            return false;
-        }
     }
 
     protected function getFactory()

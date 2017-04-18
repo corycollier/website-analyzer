@@ -9,9 +9,9 @@ class MetricsFactory
     public function factory($type)
     {
         $map = [
-            'css-complexity' => '\WebsiteAnalyzer\Metrics\CssComplexity',
+            'css-complexity'   => '\WebsiteAnalyzer\Metrics\CssComplexity',
             'technology-stack' => '\WebsiteAnalyzer\Metrics\TechnologyStack',
-            'dns-data' => '\WebsiteAnalyzer\Metrics\DnsData',
+            'dns-data'         => '\WebsiteAnalyzer\Metrics\DnsData',
         ];
 
         if (! array_key_exists($type, $map)) {
