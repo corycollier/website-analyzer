@@ -45,6 +45,7 @@ class ListBuilder
         }
 
         $client  = new Client();
+        $sites   = [];
         $config  = $this->getConfig();
         $data    = $this->getSites();
         $factory = $this->getFactory();

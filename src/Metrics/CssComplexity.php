@@ -165,13 +165,20 @@ class CssComplexity implements MetricsInterface
             'modules/taxonomy',
             'modules/accordion_blocks',
             'modules/fieldgroup',
+            'modules/field',
+            'modules/poll',
+            'modules/comment',
             'mdoules/calendar',
             'modules/date',
             'modules/views',
             'modules/cck',
             'modules/inline_labels',
             'modules/nice_menus',
+            'modules/comment',
+            'modules/search',
             'ctools',
+
+            //known wordpress files
 
             // common 3rd party libraries
             'reset.css',

@@ -32,6 +32,11 @@ class File
 
     public function save()
     {
+        $filename = $this->getFilename();
+        $dir = dirname($filename);
+        if (! file_exists($dir)) {
+            mkdir($dir);
+        }
         file_put_contents($this->getFilename(), $this->getData());
         return $this;
     }
