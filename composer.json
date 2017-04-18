@@ -15,5 +15,10 @@
         "psr-4": {
             "WebsiteAnalyzer\\": "src/"
         }
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^2.8",
+        "phpmd/phpmd": "^2.6",
+        "phpunit/phpunit": "^5.7"
     }
 }

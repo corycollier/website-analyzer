@@ -2,8 +2,6 @@
 
 namespace WebsiteAnalyzer;
 
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Yaml\Yaml;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
@@ -12,9 +10,8 @@ use GuzzleHttp\Exception\RequestException;
 
 class ListBuilder
 {
-    protected $config;
+    const PROGRESS_BAR = "\"\033[0G\033[2K %d%% - %d/%d";
     protected $factory;
-    protected $list;
     protected $results;
 
     public function __construct()
@@ -27,20 +24,15 @@ class ListBuilder
         $sites   = [];
         $factory = $this->getFactory();
         $count   = count($uris);
-        $client  = new Client();
+        $client  = $this->getClient();
         foreach ($uris as $i => $uri) {
             try {
                 $response = $client->request('GET', $uri);
                 $sites[] = $factory->factory($uri, $response);
-            } catch (ClientException $exception) {
-
-            } catch (ConnectException $exception) {
-
-            } catch (ServerException $exception) {
-
-            } catch (RequestException $exception) {
-
+            } catch (\RuntimeException $exception) {
+                error_log($exception->getMessage());
             }
+
             $this->reportProgress($i, $count);
         }
 
@@ -54,26 +46,31 @@ class ListBuilder
         return $this;
     }
 
-    public function getResults($data)
+    public function getResults()
     {
         return $this->results;
     }
 
-    public function reportProgress($step, $total)
+    public function getClient()
+    {
+        return new Client();
+    }
+
+    protected function reportProgress($step, $total)
     {
         $perc = floor(($step / $total) * 100);
-        $left = 100 - $perc;
-        $write = sprintf("\033[0G\033[2K[%'={$perc}s>%-{$left}s] - $perc%% - $step/$total", "", "");
+        $write = sprintf(self::PROGRESS_BAR, $perc, $step, $total);
         fwrite(STDERR, $write);
     }
 
-    protected function getFactory()
+    public function getFactory()
     {
         return $this->factory;
     }
-
-    protected function getConfig()
-    {
-        return $this->config;
-    }
 }
+
+
+
+//"\033[0G\033[2K[%'={$perc}s>%-{$left}s] - $perc%% - $step/$total"
+// $template = "\"\033[0G\033[2K[%'=%ds>%-%ds] - %d%% - %d/%d";
+// sprintf(self::PROGRESS_BAR, $perc, $left, $perc, $step, $total);

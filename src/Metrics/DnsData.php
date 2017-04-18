@@ -34,7 +34,9 @@ class DnsData implements MetricsInterface
             }
         } catch (\Net_DNS2_Exception $exception) {
             error_log(sprintf(
-                self::ERR_QUERY_FAIL, $subject->getUri(), $exception->getMessage()
+                self::ERR_QUERY_FAIL,
+                $subject->getUri(),
+                $exception->getMessage()
             ));
         }
 
@@ -44,6 +46,11 @@ class DnsData implements MetricsInterface
     public function getData()
     {
         return $this->data;
+    }
+
+    protected function getResolver()
+    {
+        return $this->resolver;
     }
 
     protected function getDomainName(Result $subject)
@@ -57,19 +64,9 @@ class DnsData implements MetricsInterface
         return $parts[0];
     }
 
-    protected function getResolver()
-    {
-        return $this->resolver;
-    }
-
     public function getType()
     {
         return 'dns-data';
-    }
-
-    public function report()
-    {
-        return '';
     }
 
     public function __debugInfo()
