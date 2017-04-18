@@ -6,6 +6,8 @@ use WebsiteAnalyzer\Metrics\MetricsInterface;
 
 class Result
 {
+    const ERR_INVALID_METRIC = 'Requested metric [%s] does not exist';
+
     protected $metrics;
     protected $uri;
     protected $body;
@@ -35,6 +37,15 @@ class Result
     public function getMetrics()
     {
         return $this->metrics;
+    }
+
+    public function getMetric($type)
+    {
+        $metrics = $this->getMetrics();
+        if (!array_key_exists($type, $metrics)) {
+            throw new RuntimeException(sprintf(self::ERR_INVALID_METRIC, $type));
+        }
+        return $metrics[$type];
     }
 
     public function getUri()

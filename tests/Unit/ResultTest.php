@@ -23,6 +23,51 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @dataProvider providerGetMetrics
+     */
+    public function testGetMetric($expected, $type, $metrics, $expectException = false)
+    {
+        $sut = $this->getMockBuilder('\WebsiteAnalyzer\Result')
+            ->disableOriginalConstructor()
+            ->setMethods(['getMetrics'])
+            ->getMock();
+
+        $sut->expects($this->once())
+            ->method('getMetrics')
+            ->will($this->returnValue($metrics));
+
+        if ($expectException) {
+            $this->expectException(\RuntimeException::class);
+        }
+
+        $result = $sut->getMetric($type);
+        $this->assertEquals($expected, $result);
+
+    }
+
+    public function providerGetMetrics()
+    {
+        return [
+            'simple test' => [
+                'expected' => 'expected',
+                'type' => 'type',
+                'metrics' => [
+                    'type' => 'expected',
+                ],
+            ],
+
+            'expect exception test' => [
+                'expected' => 'expected',
+                'type' => 'no-existing-type',
+                'metrics' => [
+                    'type' => 'expected',
+                ],
+                'expectException' => true,
+            ],
+        ];
+    }
+
     public function testGetUri()
     {
         $expected = 'expected value';

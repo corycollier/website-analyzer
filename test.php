@@ -4,8 +4,10 @@ require 'vendor/autoload.php';
 
 use WebsiteAnalyzer\ListBuilder;
 
+ini_set('error_log', 'errors.log');
+
 // Define all of the constants
-$urls = array_map('trim', file('data/sites.txt'));
+$urls = array_map('trim', file('data/test.txt'));
 $builder = new ListBuilder();
 $results = $builder
     ->process($urls)
@@ -13,6 +15,11 @@ $results = $builder
 
 file_put_contents('tmp/processed', serialize($results));
 
+print_r($results->getMetrics('technology-stack'));
+print_r($results->getMetrics('css-complexity'));
+print_r($results->getMetrics('dns-data'));
+
+die;
 $ips = [];
 $cssScores = [];
 foreach ($results as $result) {

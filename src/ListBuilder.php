@@ -17,18 +17,19 @@ class ListBuilder
     public function __construct()
     {
         $this->factory = new ResultFactory();
+        $this->results = new ResultList();
     }
 
     public function process($uris)
     {
-        $sites   = [];
+        $list   = $this->getResults();
         $factory = $this->getFactory();
         $count   = count($uris);
         $client  = $this->getClient();
         foreach ($uris as $i => $uri) {
             try {
                 $response = $client->request('GET', $uri);
-                $sites[] = $factory->factory($uri, $response);
+                $list[] = $factory->factory($uri, $response);
             } catch (\RuntimeException $exception) {
                 error_log($exception->getMessage());
             }
@@ -36,11 +37,11 @@ class ListBuilder
             $this->reportProgress($i, $count);
         }
 
-        $this->setResults($sites);
+        $this->setResults($list);
         return $this;
     }
 
-    public function setResults($data)
+    public function setResults(ResultList $data)
     {
         $this->results = $data;
         return $this;
