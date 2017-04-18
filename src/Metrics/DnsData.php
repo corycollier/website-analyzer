@@ -8,6 +8,7 @@ use \Net_DNS2_Exception;
 
 class DnsData implements MetricsInterface
 {
+    const ERR_QUERY_FAIL = 'DNS query for [%s] failed with message [%s]';
     protected $resolver;
     protected $data;
 
@@ -32,10 +33,9 @@ class DnsData implements MetricsInterface
                 $this->data[] = (array)$answer;
             }
         } catch (\Net_DNS2_Exception $exception) {
-            print_r([
-                'err' => $exception->getMessage(),
-                'uri' => $subject->getUri(),
-            ]);
+            error_log(sprintf(
+                self::ERR_QUERY_FAIL, $subject->getUri(), $exception->getMessage()
+            ));
         }
 
         return $this;
@@ -75,9 +75,7 @@ class DnsData implements MetricsInterface
     public function __debugInfo()
     {
         return [
-            'data'     => $this->data,
+            'data' => $this->data,
         ];
-
     }
-
 }

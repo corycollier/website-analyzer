@@ -38,7 +38,7 @@ class TechnologyStack implements MetricsInterface
         $patterns = $this->getTypePatterns();
 
         foreach ($patterns as $type => $pattern) {
-            if ($this->isMatch($body, $pattern))) {
+            if ($this->isMatch($body, $pattern)) {
                 $this->setBackend($type);
             }
         }
