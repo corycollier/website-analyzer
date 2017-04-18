@@ -1,4 +1,5 @@
 # Website Analyzer
+[![Build Status](https://travis-ci.org/corycollier/website-analyzer.svg?branch=master)](https://travis-ci.org/corycollier/website-analyzer)
 This library allows a user to run through a list of websites, and determine which ones provide a positive response, and if so, what technology stack they're running on .
 
 ## Usage
