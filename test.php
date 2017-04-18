@@ -5,7 +5,7 @@ require 'vendor/autoload.php';
 use WebsiteAnalyzer\ListBuilder;
 
 // Define all of the constants
-$urls = array_map('trim', file('data/test.txt'));
+$urls = array_map('trim', file('data/sites.txt'));
 $builder = new ListBuilder();
 $results = $builder
     ->process($urls)

@@ -52,6 +52,11 @@ class Result
         return $this->headers;
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
     public function addMetric(MetricsInterface $metric)
     {
         $type = $metric->getType();
@@ -59,27 +64,14 @@ class Result
         return $this;
     }
 
-    public function __sleep()
-    {
-        return [
-            'body',
-            'headers',
-            'status',
-            'metrics',
-            'uri',
-        ];
-    }
-
     public function __debugInfo()
     {
         return [
             'uri'     => $this->uri,
-            // 'body'    => substr($this->body, 0, 200),
-            // 'headers' => $this->headers,
-            // 'status'  => $this->status,
+            'body'    => substr($this->body, 0, 200),
+            'headers' => $this->headers,
+            'status'  => $this->status,
             'metrics' => $this->metrics,
         ];
-
     }
-
 }

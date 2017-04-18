@@ -6,6 +6,7 @@ use WebsiteAnalyzer\Result;
 
 class TechnologyStack implements MetricsInterface
 {
+    const MIN_SCORE_FOR_POSITIVE_RESULT = 3;
     protected $backend;
     protected $webserver;
 
@@ -34,7 +35,6 @@ class TechnologyStack implements MetricsInterface
     protected function parseBackend(Result $subject)
     {
         $body = strtolower($subject->getBody());
-        $headers = $subject->getHeaders();
         $patterns = $this->getTypePatterns();
 
         foreach ($patterns as $type => $pattern) {
@@ -84,7 +84,7 @@ class TechnologyStack implements MetricsInterface
             if (strpos($content, $pattern)) {
                 $score++;
             }
-            if ($score > 2) {
+            if ($score >= self::MIN_SCORE_FOR_POSITIVE_RESULT) {
                 return true;
             }
         }
@@ -99,10 +99,5 @@ class TechnologyStack implements MetricsInterface
     public function setBackend($type)
     {
         $this->backend = $type;
-    }
-
-    public function report()
-    {
-        return '';
     }
 }

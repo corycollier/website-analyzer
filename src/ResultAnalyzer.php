@@ -16,17 +16,23 @@ class ResultAnalyzer
     public function analyze(Result $subject)
     {
         $factory = $this->getMetricsFactory();
-        $metrics = [
-            'technology-stack',
-            'css-complexity',
-            'dns-data',
-        ];
+        $metrics = $this->getMetricTypes();
 
         foreach ($metrics as $type) {
             $metric = $factory->factory($type);
             $metric->calculate($subject);
             $subject->addMetric($metric);
         }
+        return $this;
+    }
+
+    public function getMetricTypes()
+    {
+        return [
+            'technology-stack',
+            'css-complexity',
+            'dns-data',
+        ];
     }
 
     public function getMetricsFactory()

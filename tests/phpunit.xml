@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="../vendor/autoload.php"
+>
+    <!-- Global PHP settings for the unit tests -->
+    <php>
+        <ini name="error_reporting" value="-1" />
+    </php>
+
+    <!-- Configure where the tests are -->
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>.</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Configure which code to include in code coverage reporting -->
+    <filter>
+        <whitelist>
+            <directory>../src</directory>
+        </whitelist>
+    </filter>
+
+    <!-- Configure logging and code coverage reporting methods -->
+    <logging>
+      <log type="coverage-html" target="../build/coverage" lowUpperBound="50"
+           highLowerBound="85"/>
+      <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+    </logging>
+
+</phpunit>

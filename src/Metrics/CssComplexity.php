@@ -34,7 +34,7 @@ class CssComplexity implements MetricsInterface
 
     protected function calculateScore()
     {
-        foreach ($this->files as $filename => $score) {
+        foreach ($this->files as $score) {
             $this->score = $this->score + $score;
         }
         return $this;
@@ -192,10 +192,5 @@ class CssComplexity implements MetricsInterface
             'logintoboggan',
 
         ];
-    }
-
-    public function report()
-    {
-        return '';
     }
 }
