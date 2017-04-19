@@ -8,7 +8,5 @@ interface MetricsInterface
 {
     public function calculate(Result $result);
 
-    public function report();
-
     public function getType();
 }

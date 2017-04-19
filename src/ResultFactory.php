@@ -20,6 +20,7 @@ class ResultFactory
 
     public function factory($uri, ResponseInterface $response)
     {
+        $analyzer = $this->getAnalyzer();
         $result = new Result([
             'headers' => array_change_key_case($response->getHeaders()),
             'status'  => $response->getStatusCode(),
@@ -27,7 +28,7 @@ class ResultFactory
             'uri'     => $uri,
         ]);
 
-        $this->getAnalyzer()->analyze($result);
+        $analyzer->analyze($result);
 
         return $result;
     }

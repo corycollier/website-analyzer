@@ -1,24 +1,27 @@
 # Website Analyzer
-This library allows a user to run through a list of websites, and determine which ones provide a positive response, and if so, what technology stack they're running on .
+[![Build Status](https://travis-ci.org/corycollier/website-analyzer.svg?branch=master)](https://travis-ci.org/corycollier/website-analyzer)
+
+This library allows a user to run through a list of websites, and determine which ones provide a positive response, and if so, aggregate a bunch of information about them.
 
 ## Usage
-```yaml
-cache:
-  path: tmp
-  type: serialize
-data:
-  path: data/sites.txt
-
-```
 
 ```php
+<?php 
+require 'vendor/autoload.php';
+
 use WebsiteAnalyzer\ListBuilder;
 
-$builder = new ListBuilder('test.yml');
+ini_set('error_log', 'errors.log');
 
-$builder
-  ->clear() // clear any previous cache
-  ->process() // process the sites
-  ->dump() // dump out the results on screen;
-);
+// Define all of the constants
+$urls = array_map('trim', file('data/test.txt'));
+$builder = new ListBuilder();
+$results = $builder
+    ->process($urls)
+    ->getResults();
+
+print_r($results->getMetrics('technology-stack'));
+print_r($results->getMetrics('css-complexity'));
+print_r($results->getMetrics('dns-data'));
+
 ```
