@@ -66,6 +66,7 @@ class ResultAnalyzerTest extends \PHPUnit_Framework_TestCase
         $expected = [
             'technology-stack',
             'css-complexity',
+            'whois-data',
             'dns-data',
         ];
 

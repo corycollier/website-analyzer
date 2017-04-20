@@ -7,7 +7,7 @@ use WebsiteAnalyzer\ListBuilder;
 ini_set('error_log', 'errors.log');
 
 // Define all of the constants
-$urls = array_map('trim', file('data/sites.txt'));
+$urls = array_map('trim', file('data/new.txt'));
 $builder = new ListBuilder();
 $results = $builder
     ->process($urls)
