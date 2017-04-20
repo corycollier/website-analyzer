@@ -16,6 +16,11 @@ class CssComplexity implements MetricsInterface
         return 'css-complexity';
     }
 
+    public function getData()
+    {
+        return $this->getFiles();
+    }
+
     public function calculate(Result $result)
     {
         $client = new Client();

@@ -16,6 +16,15 @@ class TechnologyStack implements MetricsInterface
         return 'technology-stack';
     }
 
+    public function getData()
+    {
+        return [
+            'backend' => $this->getBackend(),
+            'webserver' => $this->getWebserver(),
+            'languages' => $this->getLangages(),
+        ];
+    }
+
     public function calculate(Result $subject)
     {
         $this->parseLanguages($subject)
