@@ -28,7 +28,7 @@ class ResultAnalyzerTest extends \PHPUnit_Framework_TestCase
 
         $metric = $this->getMockBuilder('\WebsiteAnalyzer\Metrics\MetricsInterface')
             ->disableOriginalConstructor()
-            ->setMethods(['calculate', 'getType'])
+            ->setMethods(['calculate', 'getType', 'getData'])
             ->getMock();
 
         $result = $this->getMockBuilder('\WebsiteAnalyzer\Result')

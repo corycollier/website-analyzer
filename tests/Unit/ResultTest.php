@@ -118,7 +118,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         $type = 'metric-type';
         $metric = $this->getMockBuilder('\WebsiteAnalyzer\Metrics\MetricsInterface')
             ->disableOriginalConstructor()
-            ->setMethods(['calculate', 'getType'])
+            ->setMethods(['calculate', 'getType', 'getData'])
             ->getMock();
 
         $metric->expects($this->once())

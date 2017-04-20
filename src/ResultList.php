@@ -23,7 +23,7 @@ class ResultList extends \ArrayObject
         $path    = implode('.', $parts);
         $metrics = $this->getMetrics($metric);
         $results = [];
-        
+
         foreach ($metrics as $uri => $metric) {
             $data = $metric->getData();
             $results[$uri] = Arr::get($data, $path);

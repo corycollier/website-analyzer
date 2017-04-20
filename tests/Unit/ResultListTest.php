@@ -13,7 +13,7 @@ class ResultListTest extends \PHPUnit_Framework_TestCase
     {
         $metric = $this->getMockBuilder('\WebsiteAnalyzer\Metrics\MetricsInterface')
             ->disableOriginalConstructor()
-            ->setMethods(['calculate', 'getType'])
+            ->setMethods(['calculate', 'getType', 'getData'])
             ->getMock();
 
         $result = $this->getMockBuilder('\WebsiteAnalyzer\Result')
@@ -45,16 +45,31 @@ class ResultListTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerGetMetricSet
      */
-    public function testGetMetricSet($expected, $metrics, $path)
+    public function testGetMetricSet($expected, $metrics, $type, $path)
     {
         $sut = $this->getMockBuilder('\WebsiteAnalyzer\ResultList')
             ->disableOriginalConstructor()
             ->setMethods(['getMetrics'])
             ->getMock();
 
+        $metric = $this->getMockBuilder('\WebsiteAnalyzer\Metrics\MetricsInterface')
+            ->disableOriginalConstructor()
+            ->setMethods(['calculate', 'getType', 'getData'])
+            ->getMock();
+
+        $valueMap = [];
+        foreach ($metrics as $data) {
+            $valueMap[] = [$data];
+        }
+
+        $metric->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValueMap($valueMap));
+
         $sut->expects($this->once())
             ->method('getMetrics')
-            ->will($this->returnValue($metrics));
+            ->with($type)
+            ->will($this->returnValue([$metric]));
 
         $result = $sut->getMetricSet($path);
         $this->assertEquals($expected, $result);
@@ -64,7 +79,7 @@ class ResultListTest extends \PHPUnit_Framework_TestCase
     public function providerGetMetricSet()
     {
         $metrics = [
-            'the-metric' => [
+            'test.com' => [
                 'some' => [
                     'key' => [
                         'has' => [
@@ -77,26 +92,31 @@ class ResultListTest extends \PHPUnit_Framework_TestCase
                     'value 1',
                     'value 2',
                 ]
-            ],
+            ]
         ];
+
+        // @todo figure out what's wrong with the expected values here. this sucks.
         return [
             'simple test' => [
-                'expected' => ['a value'],
+                'expected' => [['a value']],
                 'metrics' => $metrics,
+                'type' => 'the-metric',
                 'path' => 'the-metric.some.key.has',
             ],
             'number test' => [
-                'expected' => [
+                'expected' => [[
                     'value 0',
                     'value 1',
                     'value 2',
-                ],
+                ]],
                 'metrics' => $metrics,
+                'type' => 'the-metric',
                 'path' => 'the-metric.numbers',
             ],
             'number 1 test' => [
-                'expected' => 'value 1',
+                'expected' => ['value 1'],
                 'metrics' => $metrics,
+                'type' => 'the-metric',
                 'path' => 'the-metric.numbers.1',
             ],
         ];
