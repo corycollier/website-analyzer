@@ -9,15 +9,66 @@ class TechnologyStack implements MetricsInterface
     const MIN_SCORE_FOR_POSITIVE_RESULT = 3;
     protected $backend;
     protected $webserver;
+    protected $languages;
 
     public function getType()
     {
         return 'technology-stack';
     }
 
+    public function getData()
+    {
+        return [
+            'backend' => $this->getBackend(),
+            'webserver' => $this->getWebserver(),
+            'languages' => $this->getLangages(),
+        ];
+    }
+
     public function calculate(Result $subject)
     {
-        $this->parseBackend($subject)->parseWebserver($subject);
+        $this->parseLanguages($subject)
+            ->parseBackend($subject)
+            ->parseWebserver($subject);
+
+        return $this;
+    }
+
+    protected function parseLanguages(Result $subject)
+    {
+        $headers = $subject->getHeaders();
+
+        if (isset($headers['set-cookie'])) {
+            foreach ($headers['set-cookie'] as $cookie) {
+                if (strpos($cookie, 'PHPSESSID') === 0) {
+                    $this->setLanguage('php', 'unknown');
+                }
+            }
+        }
+
+        if (isset($headers['x-generator'])) {
+            foreach ($headers['x-generator'] as $header) {
+                $header = strtolower($header);
+                if (strpos($header, 'wordpress') !== false) {
+                    $this->setLanguage('php', 'unknown');
+                }
+                if (strpos($header, 'drupal') !== false) {
+                    $this->setLanguage('php', 'unknown');
+                }
+            }
+        }
+
+        if (isset($headers['x-powered-by'])) {
+            $parts = explode('/', $headers['x-powered-by'][0]);
+            if (!isset($parts[1])) {
+                $parts[] = 'unknown';
+            }
+            $this->setLanguage($parts[0], $parts[1]);
+        }
+
+        if (! $this->languages) {
+            print_r($headers);
+        }
 
         return $this;
     }
@@ -36,11 +87,18 @@ class TechnologyStack implements MetricsInterface
     {
         $body = strtolower($subject->getBody());
         $patterns = $this->getTypePatterns();
+        $flag = false;
 
         foreach ($patterns as $type => $pattern) {
-            if ($this->isMatch($body, $pattern)) {
-                $this->setBackend($type);
+            if (!$this->isMatch($body, $pattern)) {
+                continue;
             }
+            $flag = true;
+            $this->setBackend($type);
+        }
+
+        if (! $flag) {
+            $this->setBackend('static');
         }
 
         return $this;
@@ -49,27 +107,26 @@ class TechnologyStack implements MetricsInterface
     protected function getTypePatterns()
     {
         return [
-            'static' => [
-                'assets/css',
-                'assets/js',
-                'modernizr',
-                'bootstrap.min.js'
-            ],
             'Wordpress' => [
                 'wordpress',
                 'wp-content/themes',
-                'wp-content/plugins'
+                'wp-content/plugins',
+                'wp-admin/',
+                'wp-includes/',
             ],
             'Drupal' => [
                 'drupal',
                 'sites/all/themes',
                 'sites/all/modules',
-                'sites/default/files'
+                'sites/default/files',
+                'core/themes/stable',
+                'core/assets/vendor/',
+                'themes/custom',
             ],
             'Dot Net Nuke' => [
                 'js/dnncore.js',
-                'DnnForge',
-                'DesktopModules',
+                'dnnforge',
+                'desktopmodules',
                 'js/dnn.xml.js',
                 'js/dnn.xml.jsparser.js'
             ],
@@ -89,6 +146,11 @@ class TechnologyStack implements MetricsInterface
             }
         }
         return false;
+    }
+
+    protected function setLanguage($language, $version)
+    {
+        $this->languages[$language] = $version;
     }
 
     protected function setWebserver($webserver)

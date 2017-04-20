@@ -11,6 +11,7 @@ class MetricsFactory
         $map = [
             'css-complexity'   => '\WebsiteAnalyzer\Metrics\CssComplexity',
             'technology-stack' => '\WebsiteAnalyzer\Metrics\TechnologyStack',
+            'whois-data'       => '\WebsiteAnalyzer\Metrics\WhoisData',
             'dns-data'         => '\WebsiteAnalyzer\Metrics\DnsData',
         ];
 

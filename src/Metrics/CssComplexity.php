@@ -16,6 +16,11 @@ class CssComplexity implements MetricsInterface
         return 'css-complexity';
     }
 
+    public function getData()
+    {
+        return $this->getFiles();
+    }
+
     public function calculate(Result $result)
     {
         $client = new Client();
@@ -97,27 +102,33 @@ class CssComplexity implements MetricsInterface
 
     protected function handleRemoteFile(Client $client, Result $result, $path)
     {
-        if (! $this->isLocalCss($path)) {
-            return;
+        $length = 0;
+        try {
+            if (! $this->isLocalCss($path)) {
+                return;
+            }
+            $response = $client->request('GET', $this->getFullPath($result, $path));
+            $length = count(explode(PHP_EOL, $response->getBody()));
+        } catch (\RuntimeException $exception) {
+            error_log($exception->getMessage());
         }
-        $response = $client->request('GET', $this->getFullPath($result, $path));
-        $length = count(explode(PHP_EOL, $response->getBody()));
-        // $headers = array_change_key_case($response->getHeaders());
-        // if (array_key_exists('content-length', $headers)) {
-        //     $length = end($headers['content-length']);
-        // }
+
         $this->files[$path] = $length;
         return $this;
     }
 
     protected function getFullPath(Result $result, $path)
     {
-        if (strpos($path, 'http')) {
+        if (strpos($path, 'http') === 0) {
             return $path;
         }
 
         if (strpos($path, $result->getUri())) {
             return $path;
+        }
+
+        if (substr($path, 0, 2) == '//') {
+            return 'http:' .  $path;
         }
 
         $result = $result->getUri() . '/' . $path;
@@ -179,6 +190,7 @@ class CssComplexity implements MetricsInterface
             'ctools',
 
             //known wordpress files
+            'wp-content/plugins/',
 
             // common 3rd party libraries
             'reset.css',

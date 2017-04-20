@@ -9,7 +9,9 @@
     "require": {
         "guzzlehttp/guzzle": "^6.2",
         "symfony/dom-crawler": "^3.2",
-        "pear/net_dns2": "^1.4"
+        "pear/net_dns2": "^1.4",
+        "phpwhois/phpwhois": "^4.2",
+        "illuminate/support": "^5.4"
     },
     "autoload": {
         "psr-4": {
