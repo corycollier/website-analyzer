@@ -8,7 +8,8 @@ class ResultList extends \ArrayObject
     {
         $results = [];
         foreach ($this as $key => $value) {
-            $results[] = $value->getMetric($type);
+            $uri = $value->getUri();
+            $results[$uri] = $value->getMetric($type);
         }
         return $results;
     }

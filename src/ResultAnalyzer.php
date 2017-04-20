@@ -31,6 +31,7 @@ class ResultAnalyzer
         return [
             'technology-stack',
             'css-complexity',
+            'whois-data',
             'dns-data',
         ];
     }
